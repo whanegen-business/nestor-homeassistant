@@ -1,0 +1,30 @@
+language: "fr"
+intents:
+  NestorAddShopping:
+    data:
+      - sentences:
+          - "ajoute [du |de la |des |de l'|de l’|un |une ]{item} [à la liste de courses|aux courses|à la liste]"
+          - "mets [du |de la |des |de l'|de l’|un |une ]{item} [sur la liste de courses|sur la liste|dans la liste]"
+          - "rajoute [du |de la |des |de l'|de l’|un |une ]{item} [à la liste|aux courses]"
+
+  NestorMarkBought:
+    data:
+      - sentences:
+          - "marque [le |la |les |du |de la |des ]{item} comme acheté[e|s|es]"
+          - "j'ai acheté [le |la |les |du |de la |des ]{item}"
+          - "coche [le |la |les ]{item} [sur la liste|dans la liste|de la liste]"
+
+  NestorCompleteRoutine:
+    data:
+      - sentences:
+          - "marque la routine {routine} comme faite"
+          - "j'ai fait {routine}"
+          - "valide la routine {routine}"
+          - "routine {routine} terminée"
+
+  NestorRefresh:
+    data:
+      - sentences:
+          - "rafraîchis [les données] nestor"
+          - "actualise [les données] nestor"
+          - "mets à jour nestor"
