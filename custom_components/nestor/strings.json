@@ -20,5 +20,15 @@
     "abort": {
       "already_configured": "This household is already configured."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Nestor Options",
+        "data": {
+          "expiry_threshold_days": "Expiry threshold (days)"
+        }
+      }
+    }
   }
 }

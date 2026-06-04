@@ -12,12 +12,21 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
 )
 
-from .const import CONF_HOUSEHOLD_ID, CONF_SERVICE_ACCOUNT_JSON, DOMAIN
+from .const import (
+    CONF_EXPIRY_THRESHOLD_DAYS,
+    CONF_HOUSEHOLD_ID,
+    CONF_SERVICE_ACCOUNT_JSON,
+    DEFAULT_EXPIRY_THRESHOLD_DAYS,
+    DOMAIN,
+)
 from .firestore import FirestoreClient
 
 _LOGGER = logging.getLogger(__name__)
@@ -64,6 +73,10 @@ async def _validate_connection(hass: HomeAssistant, data: dict) -> dict:
 class NestorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
+    @staticmethod
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> NestorOptionsFlow:
+        return NestorOptionsFlow(config_entry)
+
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         errors: dict[str, str] = {}
 
@@ -97,6 +110,28 @@ class NestorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=STEP_USER_DATA_SCHEMA,
             errors=errors,
         )
+
+
+class NestorOptionsFlow(config_entries.OptionsFlow):
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None):
+        current_threshold = self.config_entry.options.get(
+            CONF_EXPIRY_THRESHOLD_DAYS, DEFAULT_EXPIRY_THRESHOLD_DAYS
+        )
+
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_EXPIRY_THRESHOLD_DAYS, default=current_threshold
+                ): NumberSelector(
+                    NumberSelectorConfig(min=1, max=30, step=1, mode=NumberSelectorMode.BOX)
+                ),
+            }
+        )
+        return self.async_show_form(step_id="init", data_schema=schema)
 
 
 class InvalidServiceAccountJson(HomeAssistantError):

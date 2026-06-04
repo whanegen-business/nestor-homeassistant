@@ -10,17 +10,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import CONF_EXPIRY_THRESHOLD_DAYS, DEFAULT_EXPIRY_THRESHOLD_DAYS, DOMAIN
 from .coordinator import NestorCoordinator
-
-DEFAULT_EXPIRY_THRESHOLD_DAYS = 3
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator: NestorCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    threshold = entry.options.get("expiry_threshold_days", DEFAULT_EXPIRY_THRESHOLD_DAYS)
+    threshold = int(entry.options.get(CONF_EXPIRY_THRESHOLD_DAYS, DEFAULT_EXPIRY_THRESHOLD_DAYS))
 
     async_add_entities(
         [
