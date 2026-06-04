@@ -1,0 +1,15 @@
+{
+  "domain": "nestor",
+  "name": "Nestor",
+  "version": "0.1.0",
+  "documentation": "https://github.com/TON-PSEUDO/nestor-homeassistant",
+  "issue_tracker": "https://github.com/TON-PSEUDO/nestor-homeassistant/issues",
+  "dependencies": [],
+  "codeowners": ["@TON-PSEUDO"],
+  "requirements": [
+    "PyJWT==2.8.0",
+    "cryptography>=41.0.0"
+  ],
+  "config_flow": true,
+  "iot_class": "cloud_polling"
+}

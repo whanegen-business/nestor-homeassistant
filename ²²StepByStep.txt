@@ -1,0 +1,18 @@
+Plan des étapes suivantes
+Étape 2 — Capteurs (sensor.py)
+
+5 SensorEntity + 1 BinarySensorEntity décrits dans SENSORS.md
+Brancher sur le coordinator (pas de I/O propre)
+Ajouter "sensor" et "binary_sensor" dans PLATFORMS
+Étape 3 — Services (services.yaml + services.py)
+
+nestor.add_to_shopping_list, nestor.mark_bought, nestor.complete_routine, nestor.refresh
+Écriture Firestore via patch_document / create_document
+Étape 4 — Options flow
+
+Seuil de péremption N jours (défaut 3) modifiable après installation
+OptionsFlow dans config_flow.py
+Étape 5 — Assist / phrases personnalisées
+
+custom_sentences/fr/nestor.yaml pour les commandes vocales
+Mapping phrases → services HA

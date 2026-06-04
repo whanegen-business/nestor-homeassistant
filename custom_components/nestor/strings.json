@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Nestor",
+        "description": "Paste the content of your Firebase Service Account JSON key and enter your household ID.",
+        "data": {
+          "service_account_json": "Service Account JSON key (paste full content)",
+          "household_id": "Household ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Firestore. Check your network and try again.",
+      "invalid_auth": "Authentication failed. Check your Service Account key.",
+      "invalid_service_account": "Invalid Service Account JSON. Make sure you pasted the full key file content.",
+      "household_not_found": "Household not found. Check the Household ID.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This household is already configured."
+    }
+  }
+}

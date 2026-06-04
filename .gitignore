@@ -1,0 +1,16 @@
+# Secrets Firebase — JAMAIS sur GitHub
+*serviceAccount*.json
+*service-account*.json
+*.key.json
+firebase-key.json
+.secrets/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / éditeur
+.DS_Store
+.vscode/

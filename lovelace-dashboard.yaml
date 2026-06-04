@@ -1,0 +1,92 @@
+# Dashboard Lovelace — Nestor
+#
+# À coller dans un nouveau tableau de bord HA :
+# Paramètres → Tableaux de bord → Ajouter → Modifier en YAML (mode brut).
+# Adapte les noms d'entités si tu as un préfixe différent.
+
+title: Nestor
+views:
+  - title: Foyer
+    path: nestor
+    icon: mdi:home-heart
+    cards:
+
+      # --- Résumé en chiffres ---
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.nestor_courses_a_acheter
+            name: À acheter
+            icon: mdi:cart
+          - type: entity
+            entity: sensor.nestor_peremptions_proches
+            name: Expirent bientôt
+            icon: mdi:clock-alert
+          - type: entity
+            entity: sensor.nestor_routines_a_faire
+            name: Routines
+            icon: mdi:repeat
+
+      # --- Alerte péremption urgente ---
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.nestor_peremption_urgente
+            state: "on"
+        card:
+          type: markdown
+          content: >
+            ## ⚠️ Péremption urgente
+
+            **{{ states('sensor.nestor_prochaine_peremption') }}** —
+            {{ state_attr('sensor.nestor_prochaine_peremption', 'product') }}
+
+      # --- Liste des péremptions proches ---
+      - type: markdown
+        title: Expirent bientôt
+        content: >
+          {% set items = state_attr('sensor.nestor_peremptions_proches', 'items') %}
+          {% if items %}
+          {% for it in items %}
+          - **{{ it.name }}** — {{ it.expiry }} ({{ it.days_left }} j)
+          {% endfor %}
+          {% else %}
+          Rien ne périme dans les prochains jours. 👍
+          {% endif %}
+
+      # --- Liste de courses ---
+      - type: markdown
+        title: Liste de courses
+        content: >
+          {% set items = state_attr('sensor.nestor_courses_a_acheter', 'items') %}
+          {% if items %}
+          {% for it in items %}
+          - {{ it }}
+          {% endfor %}
+          {% else %}
+          Liste vide.
+          {% endif %}
+
+      # --- Ajout rapide aux courses ---
+      - type: entities
+        title: Ajouter aux courses
+        entities:
+          - type: call-service
+            name: Ajouter du lait
+            icon: mdi:bottle-soda
+            service: nestor.add_to_shopping_list
+            service_data:
+              name: Lait
+              quantity: 1 L
+
+      # --- Routines à faire ---
+      - type: markdown
+        title: Routines à faire
+        content: >
+          {% set items = state_attr('sensor.nestor_routines_a_faire', 'items') %}
+          {% if items %}
+          {% for it in items %}
+          - **{{ it.name }}** — prévu {{ it.due_date }}
+          {% endfor %}
+          {% else %}
+          Tout est à jour. ✨
+          {% endif %}
