@@ -1,33 +1,39 @@
 # À coller dans configuration.yaml (ou inclure via !include intent_script.yaml)
 # Nécessite que les services nestor soient chargés.
 
+
+# ======================
+# NESTOR
+# ======================
+
 intent_script:
   NestorAddShopping:
     action:
-      - service: nestor.add_to_shopping_list
-        data:
-          name: "{{ item }}"
+      service: nestor.add_to_shopping_list
+      data:
+        name: "{{ slots.item }}"
     speech:
-      text: "{{ item }} ajouté à la liste de courses."
+      text: "{{ slots.item }} ajouté à la liste de courses."
 
   NestorMarkBought:
     action:
-      - service: nestor.mark_bought
-        data:
-          name: "{{ item }}"
+      service: nestor.mark_bought
+      data:
+        name: "{{ slots.item }}"
     speech:
-      text: "{{ item }} marqué comme acheté."
+      text: "{{ slots.item }} marqué comme acheté."
 
   NestorCompleteRoutine:
     action:
-      - service: nestor.complete_routine
-        data:
-          name: "{{ routine }}"
+      service: nestor.complete_routine
+      data:
+        name: "{{ slots.routine }}"
     speech:
-      text: "Routine {{ routine }} validée."
+      text: "Routine {{ slots.routine }} validée."
 
   NestorRefresh:
     action:
-      - service: nestor.refresh
+      service: nestor.refresh
     speech:
       text: "Données Nestor actualisées."
+

@@ -75,7 +75,7 @@ class NestorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> NestorOptionsFlow:
-        return NestorOptionsFlow(config_entry)
+        return NestorOptionsFlow()
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         errors: dict[str, str] = {}

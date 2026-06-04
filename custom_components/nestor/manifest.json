@@ -2,12 +2,12 @@
   "domain": "nestor",
   "name": "Nestor",
   "version": "0.1.0",
-  "documentation": "https://github.com/TON-PSEUDO/nestor-homeassistant",
-  "issue_tracker": "https://github.com/TON-PSEUDO/nestor-homeassistant/issues",
+  "documentation": "https://github.com/whanegen-business/nestor-homeassistant",
+  "issue_tracker": "https://github.com/whanegen-business/nestor-homeassistant/issues",
   "dependencies": [],
-  "codeowners": ["@TON-PSEUDO"],
+  "codeowners": ["@whanegen-business"],
   "requirements": [
-    "PyJWT==2.8.0",
+    "PyJWT>=2.8.0",
     "cryptography>=41.0.0"
   ],
   "config_flow": true,

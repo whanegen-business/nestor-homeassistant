@@ -50,10 +50,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
             "name": data["name"],
             "bought": False,
             "addedBy": "homeassistant",
-            "addedAt": _now_iso(),
+            "createdAt": _now_iso(),
+            "quantity": data["quantity"],
         }
-        if data["quantity"]:
-            doc["quantity"] = data["quantity"]
 
         await client.create_document(f"households/{household_id}/shoppingItems", doc)
         _LOGGER.debug("Nestor: added '%s' to shopping list", data["name"])
