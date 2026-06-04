@@ -1,0 +1,46 @@
+add_to_shopping_list:
+  name: Ajouter à la liste de courses
+  description: Ajoute un article à la liste de courses du foyer.
+  fields:
+    name:
+      name: Nom
+      description: Nom de l'article à ajouter.
+      required: true
+      example: "Lait"
+      selector:
+        text:
+    quantity:
+      name: Quantité
+      description: Quantité optionnelle.
+      required: false
+      example: "2 L"
+      selector:
+        text:
+
+mark_bought:
+  name: Marquer comme acheté
+  description: Coche un article de la liste de courses comme acheté (par nom).
+  fields:
+    name:
+      name: Nom
+      description: Nom de l'article à marquer comme acheté.
+      required: true
+      example: "Lait"
+      selector:
+        text:
+
+complete_routine:
+  name: Valider une routine
+  description: Valide l'occurrence d'une routine et recalcule la prochaine échéance.
+  fields:
+    name:
+      name: Nom
+      description: Nom de la routine à valider.
+      required: true
+      example: "Changer les draps"
+      selector:
+        text:
+
+refresh:
+  name: Rafraîchir
+  description: Force un rafraîchissement immédiat des données Nestor.

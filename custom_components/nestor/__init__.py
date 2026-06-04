@@ -12,6 +12,7 @@ from homeassistant.core import HomeAssistant
 from .const import CONF_HOUSEHOLD_ID, CONF_SERVICE_ACCOUNT_JSON, DOMAIN
 from .coordinator import NestorCoordinator
 from .firestore import FirestoreClient
+from .services import async_setup_services, async_unload_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +36,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    if not hass.services.has_service(DOMAIN, "refresh"):
+        await async_setup_services(hass)
+
     return True
 
 
@@ -43,4 +48,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         data = hass.data[DOMAIN].pop(entry.entry_id)
         await data["session"].close()
+        if not hass.data.get(DOMAIN):
+            await async_unload_services(hass)
     return unload_ok
