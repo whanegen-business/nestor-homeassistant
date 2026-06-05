@@ -27,6 +27,7 @@ async def async_setup_entry(
             NestorExpiringItemsSensor(coordinator, threshold),
             NestorRoutinesDueSensor(coordinator),
             NestorNextExpiryDateSensor(coordinator),
+            NestorToConsumeNowSensor(coordinator),
         ]
     )
 
@@ -42,6 +43,22 @@ def _parse_date(value: str | None) -> date | None:
 
 def _days_until(d: date) -> int:
     return (d - date.today()).days
+
+
+def _active_units(item: dict) -> list[dict]:
+    """Retourne les unités actives d'un produit (status 'active' ou absent)."""
+    units = item.get("units", [])
+    if not isinstance(units, list):
+        return []
+    result = []
+    for u in units:
+        if not isinstance(u, dict):
+            continue
+        status = u.get("status")
+        if status and status != "active":
+            continue
+        result.append(u)
+    return result
 
 
 class NestorShoppingItemsSensor(CoordinatorEntity, SensorEntity):
@@ -83,10 +100,39 @@ class NestorInventoryTotalSensor(CoordinatorEntity, SensorEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         items = self.coordinator.data.get("inventory_items", [])
         by_location: dict[str, int] = {}
+        produits: list[dict] = []
+
         for item in items:
             loc = item.get("location") or "inconnu"
             by_location[loc] = by_location.get(loc, 0) + 1
-        return {"par_emplacement": by_location}
+
+            active = _active_units(item)
+            active_dates = []
+            for u in active:
+                exp = _parse_date(u.get("expiryDate") or u.get("expiry_date"))
+                if exp is not None:
+                    active_dates.append(exp)
+
+            prochaine = min(active_dates).isoformat() if active_dates else None
+
+            produits.append({
+                "nom": item.get("name"),
+                "emplacement": loc,
+                "unites": len(active),
+                "prochaine_peremption": prochaine,
+            })
+
+        produits.sort(
+            key=lambda p:(
+                p["emplacement"] or "",
+                p["prochaine_peremption"] or "9999-99-99",
+            )
+        )
+
+        return {
+            "par_emplacement": by_location,
+            "produits": produits,
+        }
 
 
 class NestorExpiringItemsSensor(CoordinatorEntity, SensorEntity):
@@ -102,12 +148,7 @@ class NestorExpiringItemsSensor(CoordinatorEntity, SensorEntity):
     def _expiring_units(self) -> list[dict]:
         result = []
         for item in self.coordinator.data.get("inventory_items", []):
-            units = item.get("units", [])
-            if not isinstance(units, list):
-                continue
-            for unit in units:
-                if not isinstance(unit, dict):
-                    continue
+            for unit in _active_units(item):
                 exp = _parse_date(unit.get("expiryDate") or unit.get("expiry_date"))
                 if exp is None:
                     continue
@@ -169,12 +210,7 @@ class NestorNextExpiryDateSensor(CoordinatorEntity, SensorEntity):
         best_date: date | None = None
         best_name: str | None = None
         for item in self.coordinator.data.get("inventory_items", []):
-            units = item.get("units", [])
-            if not isinstance(units, list):
-                continue
-            for unit in units:
-                if not isinstance(unit, dict):
-                    continue
+            for unit in _active_units(item):
                 exp = _parse_date(unit.get("expiryDate") or unit.get("expiry_date"))
                 if exp is None:
                     continue
@@ -192,3 +228,36 @@ class NestorNextExpiryDateSensor(CoordinatorEntity, SensorEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         _, name = self._find_next()
         return {"produit": name}
+    
+class NestorToConsumeNowSensor(CoordinatorEntity, SensorEntity):
+    _attr_name = "Nestor à consommer maintenant"
+    _attr_unique_id = "nestor_a_consommer_maintenant"
+    _attr_icon = "mdi:alert-circle"
+    _attr_native_unit_of_measurement = "unités"
+
+    def __init__(self, coordinator: NestorCoordinator) -> None:
+        super().__init__(coordinator)
+
+    def _units(self) -> list[dict]:
+        result = []
+        for item in self.coordinator.data.get("inventory_items", []):
+            for unit in _active_units(item):
+                exp = _parse_date(unit.get("expiryDate") or unit.get("expiry_date"))
+                if exp is None:
+                    continue
+                days = _days_until(exp)
+                if days <= 0:  # périmé ou aujourd'hui
+                    result.append({
+                        "nom": item.get("name"),
+                        "date": exp.isoformat(),
+                        "jours_restants": days,
+                    })
+        return sorted(result, key=lambda x: x["jours_restants"])
+
+    @property
+    def native_value(self) -> int:
+        return len(self._units())
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {"unités": self._units()}

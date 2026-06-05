@@ -44,3 +44,39 @@ complete_routine:
 refresh:
   name: Rafraîchir
   description: Force un rafraîchissement immédiat des données Nestor.
+
+add_inventory_item:
+  name: Ajouter à l'inventaire
+  description: Crée un nouveau produit dans l'inventaire avec une unité.
+  fields:
+    name:
+      name: Nom
+      required: true
+      example: Yaourts nature
+      selector:
+        text:
+    location:
+      name: Emplacement
+      example: frigo
+      selector:
+        select:
+          options:
+            - frigo
+            - congelateur
+            - placard
+            - cave
+    quantity:
+      name: Quantité
+      example: x4
+      selector:
+        text:
+    expiry_date:
+      name: Date de péremption
+      example: "2026-06-15"
+      selector:
+        date:
+    emoji:
+      name: Emoji
+      example: "🥛"
+      selector:
+        text:
